@@ -1,12 +1,72 @@
 //import React from "react";
 import React from "react";
+import {useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 
 const Signin = () => {
-
+    const SHEET_ID = '1BKA1gZL7_hJhY2ytYX59PTRNpQFNeG3LjV1k7U7X5cs'
+    const ACCESS_TOKEN = `AIzaSyBB2A-_TE_E3L_aHDFfBI90g_9V33xg91U`
+    const formRef = useRef(null)
+    const [name, setName] = useState("");
+    const [voltype, setVoltype] = useState("");
+    const [starttime, setStart] = useState("");
     const locale = 'en';
     const [today, setDate] = React.useState(new Date());
+    const [loading, setLoading] = useState(false)
+
+//Here is where the information to both save to LocalStorage AND send to Google Sheets logic will probably have to go.
+    const scriptURL = ""
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        setLoading(true)
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}:batchUpdate`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                //update this token with yours. 
+                Authorization: `Bearer ${ACCESS_TOKEN}`, 
+            },
+            body: JSON.stringify({
+
+                "requests": [
+                  {
+                    "updateCells": {
+                      "range": {
+                        "startRowIndex": 0,
+                        "startColumnIndex": 0,
+                        "endColumnIndex": 1,
+                        "endRowIndex": 3,
+                        "sheetId": 0
+                      },
+                      " ": [
+                        {
+                          "values": [
+                            {
+                              "userEnteredValue": {
+                                "stringValue": {name}
+                              }
+                            }
+                          ]
+                        },
+                    ],
+                      "fields": "*"
+                    }
+                  }
+                ]
+        
+              })
+            })
+
+        alert(`Your name is: ${name}
+                you are volunteering to: ${voltype}
+                starting at: ${starttime}`)
+            }
+
+    const handleValueChange = (event) => {
+        event.preventDefault();
+        setVoltype(event.target.value)
+    }
 
     React.useEffect(() => {
         const timer = setInterval(() => {
@@ -22,14 +82,12 @@ const Signin = () => {
 
   
   const time = today.toLocaleTimeString(locale, { hour: 'numeric', hour12: true, minute: 'numeric' });
-    console.log(date);
-    console.log(time)
     return(
         
         <div>
             <h1>{date}</h1>
             <h2>{time}</h2>
-            <form id="volinform">
+            <form ref={formRef} onSubmit={handleSubmit}>
                 <table>
                     <tr>
                         <th>First and Last Name</th>
@@ -37,22 +95,32 @@ const Signin = () => {
                         <th>Select Start Time</th>
                     </tr>
                     <tr>
-                        <td><input type="text" id='playername' defaultValue={"Todd Larrington"}/></td>
+                        <td><input 
+                            type="text" 
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}/></td>
                         <td>
-                            <table>
+                        <table onChange={handleValueChange}>
                                 <tr>
-                                    <td><input type="radio" id="voltype1" name="voltype" value="Monster"/><label for="signout">Monster Town</label></td>
-                                    <td><input type="radio" id="voltype2" name="voltype" value="Tavern"/><label for="signout">Tavern Shift</label></td>
-                                    <td><input type="radio" id="voltype3" name="voltype" value="Safety"/><label for="signout">Safety Check In</label></td>
+                                    <input type="radio" id="voltype1" name="voltype" value="Monster"/>Monster Town
+                                    <input type="radio" id="voltype1" name="voltype" value="Tavern"/>Tavern Shift
+                                    <input type="radio" id="voltype1" name="voltype" value="Safety"/>Safety Check In
                                 </tr>
                                 <tr>
-                                    <td><input type="radio" id="voltype4" name="voltype" value="Cleanup"/><label for="signout">Setup/CleanUp</label></td>
-                                    <td><input type="radio" id="voltype5" name="voltype" value="Marshall"/><label for="signout">Marshalling</label></td>
-                                    <td><input type="radio" id="voltype6" name="voltype" value="Media"/><label for="signout">Social Media</label></td>
+                                    <input type="radio" id="voltype1" name="voltype" value="Cleanup"/>Set Up / Clean Up
+                                    <input type="radio" id="voltype1" name="voltype" value="Marshal"/>Marshalling
+                                    <input type="radio" id="voltype1" name="voltype" value="Media"/>Social Media
                                 </tr>
-                            </table>
+                        </table>
                         </td>
-                        <td><input type="datetime-local" id='starttime'/></td>
+                        <td><input 
+                                type="datetime-local" 
+                                value={starttime}
+                                onChange={(e) => setStart(e.target.value)}/></td>
+                    </tr>
+                    <tr>
+                        
+                        
                     </tr>
                     <tr><td><input type='submit' value="Submit"/></td></tr>
                 </table>
@@ -64,4 +132,3 @@ const Signin = () => {
 };
 
 export default Signin;
-

@@ -9,7 +9,7 @@ const Layout = () => {
         <div>
         <p>Volunteer Sign In and Sign Out</p>
             <Link to="Signin"><button>Signing In</button></Link>
-            <Link to="Signin"><button>Signing Out</button></Link>
+            <Link to="Signout"><button>Signing Out</button></Link>
            </div>
     )
 

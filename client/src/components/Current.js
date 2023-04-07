@@ -3,34 +3,9 @@ import React from "react";
 import {useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
-const { google } = require('googleapis')
-const sheets = google.sheets(`v4`);
-const { GoogleAuth } = require('google-auth-library');
+import {addRow} from "../utils/googleSheetsService";
 
 
-
-const spreadsheetId = process.env.REACT_APP_SHEET_ID;
-
-
-async function updateSpreadSheetValues2({name,voltype,starttime}) {
-    const request = {
-        spreadsheetId,
-        range: `Sheet1A:4`,
-        valueInputOption: `USER_ENTERED`,
-        insertDataOption: `INSERT_ROWS`,
-        resource: {
-            "majorDimension": "ROWS",
-            "values": [name,voltype,starttime]
-        }
-
-    }
-    
-    try {
-    const res = await sheets.spreadsheets.values.append(request);
-  } catch (err) {
-    console.error(err);
-  }
-}
 
 const Signin = () => {
     const formRef = useRef(null)
@@ -45,9 +20,9 @@ const Signin = () => {
 //Here is where the information to both save to LocalStorage AND send to Google Sheets logic will probably have to go.
     const handleSubmit = (event) => {
         event.preventDefault();
-        setLoading(true);
+        setLoading(true)
 
-       updateSpreadSheetValues2(name, voltype, starttime);
+        addRow(name,voltype,starttime);
 
 
         alert(`Your name is: ${name}
